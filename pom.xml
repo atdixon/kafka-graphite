@@ -15,11 +15,6 @@
     <maven>3.0.4</maven>
   </prerequisites>
 
-  <properties>
-      <!-- atdixon custom rpm version to release -->
-      <rpm.deploy.version>1.0.0</rpm.deploy.version>
-  </properties>
-
   <dependencies>
     <dependency>
       <groupId>org.apache.kafka</groupId>
@@ -142,6 +137,8 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <shaded.name>uber</shaded.name>
+    <!-- atdixon custom rpm version to release -->
+    <rpm.deploy.version>1.0.0</rpm.deploy.version>
   </properties>
 
   <build>
@@ -258,75 +255,85 @@
           </archive>
         </configuration>
       </plugin>
-        <!-- build standalone rpm with kafka graphite jars. -->
-        <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>rpm-maven-plugin</artifactId>
-            <version>2.1.3</version>
-            <executions>
-                <execution>
-                    <id>kafka-graphite-jars-rpm</id>
-                    <phase>package</phase>
-                    <goals>
-                        <goal>attached-rpm</goal>
-                    </goals>
-                    <configuration>
-                        <group>Applications/System</group>
-                        <!-- rpm artifact/install name -->
-                        <name>kafka-graphite-jars</name>
-                        <!-- rpm artifact/install version -->
-                        <projversion>${rpm.deploy.version}</projversion>
-                        <classifier>rpm</classifier>
-                        <mappings>
-                            <mapping>
-                                <!-- install into /opt/kafka-graphite-jars -->
-                                <directory>/opt/kafka-graphite-jars</directory>
-                                <filemode>755</filemode>
-                                <username>buzzuser</username>
-                                <groupname>buzzuser</groupname>
-                                <dependency>
-                                    <includes>
-                                        <include>org.apache.kafka:kafka_2.10</include>
-                                        <include>com.yammer.metrics:metrics-graphite</include>
-                                    </includes>
-                                </dependency>
-                            </mapping>
-                        </mappings>
-                    </configuration>
-                </execution>
-            </executions>
-        </plugin>
-        <plugin> <!-- deploy rpm to yum -->
-            <groupId>com.bazaarvoice.maven.plugins</groupId>
-            <artifactId>s3repo-maven-plugin</artifactId>
-            <version>3.5</version>
-            <executions>
-                <execution>
-                    <phase>deploy</phase>
-                    <goals>
-                        <goal>create-update</goal>
-                    </goals>
-                    <configuration>
-                        <s3RepositoryPath>${provided.target.s3RepositoryPath}</s3RepositoryPath>
-                        <createrepoOpts>--simple-md-filenames --no-database</createrepoOpts>
-                        <ignoreVerificationFailures>true</ignoreVerificationFailures>
-                        <artifactItems>
-                            <artifactItem>
-                                <groupId>${project.groupId}</groupId>
-                                <artifactId>${project.artifactId}</artifactId>
-                                <version>${project.version}</version>
-                                <type>rpm</type>
-                                <classifier>rpm</classifier>
-                                <!-- nicety: use explicit basename so we don't see this pom version -->
-                                <targetBaseName>kafka-graphite-jars-${rpm.deploy.version}</targetBaseName>
-                                <targetSubfolder>kafka-graphite-jars</targetSubfolder>
-                            </artifactItem>
-                        </artifactItems>
-                    </configuration>
-                </execution>
-            </executions>
-        </plugin>
     </plugins>
   </build>
+
+    <profiles>
+        <profile>
+            <id>deploy-kafka-graphite-jars</id>
+            <build>
+                <plugins>
+                    <!-- build standalone rpm with kafka graphite jars. -->
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>rpm-maven-plugin</artifactId>
+                        <version>2.1.3</version>
+                        <executions>
+                            <execution>
+                                <id>kafka-graphite-jars-rpm</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>attached-rpm</goal>
+                                </goals>
+                                <configuration>
+                                    <group>Applications/System</group>
+                                    <!-- rpm artifact/install name -->
+                                    <name>kafka-graphite-jars</name>
+                                    <!-- rpm artifact/install version -->
+                                    <projversion>${rpm.deploy.version}</projversion>
+                                    <classifier>rpm</classifier>
+                                    <mappings>
+                                        <mapping>
+                                            <!-- install into /opt/kafka-graphite-jars -->
+                                            <directory>/opt/kafka-graphite-jars</directory>
+                                            <filemode>755</filemode>
+                                            <username>buzzuser</username>
+                                            <groupname>buzzuser</groupname>
+                                            <dependency>
+                                                <includes>
+                                                    <include>org.apache.kafka:kafka_2.10</include>
+                                                    <include>com.yammer.metrics:metrics-graphite</include>
+                                                </includes>
+                                            </dependency>
+                                        </mapping>
+                                    </mappings>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin> <!-- deploy rpm to yum -->
+                        <groupId>com.bazaarvoice.maven.plugins</groupId>
+                        <artifactId>s3repo-maven-plugin</artifactId>
+                        <version>3.5</version>
+                        <executions>
+                            <execution>
+                                <phase>deploy</phase>
+                                <goals>
+                                    <goal>create-update</goal>
+                                </goals>
+                                <configuration>
+                                    <s3RepositoryPath>${provided.target.s3RepositoryPath}</s3RepositoryPath>
+                                    <createrepoOpts>--simple-md-filenames --no-database</createrepoOpts>
+                                    <ignoreVerificationFailures>true</ignoreVerificationFailures>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>${project.groupId}</groupId>
+                                            <artifactId>${project.artifactId}</artifactId>
+                                            <version>${project.version}</version>
+                                            <type>rpm</type>
+                                            <classifier>rpm</classifier>
+                                            <!-- nicety: use explicit basename so we don't see this pom version -->
+                                            <targetBaseName>kafka-graphite-jars-${rpm.deploy.version}</targetBaseName>
+                                            <targetSubfolder>kafka-graphite-jars</targetSubfolder>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>

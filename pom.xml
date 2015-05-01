@@ -317,7 +317,6 @@
                                     <s3RepositoryPath>${provided.target.s3RepositoryPath}</s3RepositoryPath>
                                     <createrepoOpts>--simple-md-filenames --no-database</createrepoOpts>
                                     <ignoreVerificationFailures>true</ignoreVerificationFailures>
-                                    <doNotValidate>true</doNotValidate>
                                     <artifactItems>
                                         <artifactItem>
                                             <groupId>${project.groupId}</groupId>

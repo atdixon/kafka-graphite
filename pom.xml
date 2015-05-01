@@ -260,7 +260,7 @@
 
     <profiles>
         <profile>
-            <id>deploy-kafka-graphite-jars</id>
+            <id>deploy-rpm</id>
             <build>
                 <plugins>
                     <!-- build standalone rpm with kafka graphite jars. -->

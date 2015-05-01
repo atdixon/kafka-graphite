@@ -121,6 +121,7 @@
     </dependency>
   </dependencies>
 
+    <!--
   <distributionManagement>
     <repository>
       <id>criteo.releases</id>
@@ -133,6 +134,7 @@
       <url>http://maven/content/repositories/criteo.snapshots</url>
     </snapshotRepository>
   </distributionManagement>
+    -->
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -182,7 +184,7 @@
         <artifactId>maven-javadoc-plugin</artifactId>
         <version>2.9</version>
         <configuration>
-          <skip>true</skip>
+          <skip>true</skip> <!-- custom atdixon -->
           <!-- Add nice UML graph -->
           <doclet>org.umlgraph.doclet.UmlGraphDoc</doclet>
           <docletArtifact>
@@ -307,7 +309,7 @@
                         <version>3.5</version>
                         <executions>
                             <execution>
-                                <phase>deploy</phase>
+                                <phase>package</phase> <!-- use package phase, don't require deploy -->
                                 <goals>
                                     <goal>create-update</goal>
                                 </goals>
